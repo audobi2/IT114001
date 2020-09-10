@@ -1,2 +1,30 @@
 myprivatecreds.*
 
+/.metadata/
+
+#Java related
+target/**
+*.jar
+*.war
+*.ear
+*.class
+
+#eclipse specific
+*.pydevproject
+.project
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+
+#external tool builders
+.externalToolBuilders/
+
+.launch
