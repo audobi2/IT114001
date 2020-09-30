@@ -11,6 +11,7 @@ public class NumberGuesserHW {
 	private int maxStrikes = 5;
 	private int number = 0;
 	private boolean isRunning = false;
+	private int loseStreak = 0; //new variable to keep track of losing streak
 	final String saveFile = "numberGuesserSave.txt";
 
 	/***
@@ -26,12 +27,14 @@ public class NumberGuesserHW {
 	}
 
 	//changed position of saveData(); (previously saveLevel();) in win() and lose() functions
+	//loseStreak resets to 0 when win, increases by 1 when lose
 	private void win() {
 		System.out.println("That's right!");
 		level++;// level up!
 		strikes = 0;
 		System.out.println("Welcome to level " + level);
 		number = getNumber(level);
+		loseStreak = 0;
 		saveData();
 	}
 
@@ -44,7 +47,16 @@ public class NumberGuesserHW {
 			level = 1;
 		}
 		number = getNumber(level);
+		loseStreak++;
 		saveData();
+		//if lose streak gets too high, let player know and reset everything to beginning values
+		if(loseStreak > 5) {
+			System.out.println("Too many losses! Returning to beginning...");
+			level = 1;
+			strikes = 0;
+			loseStreak = 0;
+			System.out.println("Please guess a number.");
+		}
 	}
 
 	private void processCommands(String message) {
@@ -102,10 +114,10 @@ public class NumberGuesserHW {
 	}
 
 	//new method saveData()
-	//does what saveLevel does but also writes strikes and number to be guessed to file
+	//does what saveLevel does but also writes strikes and number AND loseStreak to be guessed to file
 	private void saveData() {
 		try (FileWriter fw = new FileWriter(saveFile)) {
-			fw.write("" + level + " " + strikes + " " + number);
+			fw.write("" + level + " " + strikes + " " + number + " " + loseStreak); 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -119,15 +131,17 @@ public class NumberGuesserHW {
 		}
 		try (Scanner reader = new Scanner(file)) {
 			while (reader.hasNextLine()) {
-				//reads strikes and number from file in addition to level
+				//reads strikes and number AND loseStreak from file in addition to level
 				int _level = reader.nextInt();
 				int _strikes = reader.nextInt();
 				int _number = reader.nextInt();
+				int _loseStreak = reader.nextInt();
 				if (_level > 1) {
-					//sets current strikes and number to ints read in from file
+					//sets current strikes and number AND loseStreak to ints read in from file
 					level = _level;
 					strikes = _strikes;	
 					number = _number;
+					loseStreak = _loseStreak;
 					break;
 				}
 			}
