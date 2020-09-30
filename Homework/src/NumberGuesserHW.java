@@ -25,13 +25,14 @@ public class NumberGuesserHW {
 		return new Random().nextInt(range) + 1;
 	}
 
+	//changed position of saveData(); (previously saveLevel();) in win() and lose() functions
 	private void win() {
 		System.out.println("That's right!");
 		level++;// level up!
-		saveLevel();
 		strikes = 0;
 		System.out.println("Welcome to level " + level);
 		number = getNumber(level);
+		saveData();
 	}
 
 	private void lose() {
@@ -42,8 +43,8 @@ public class NumberGuesserHW {
 		if (level < 1) {
 			level = 1;
 		}
-		saveLevel();
 		number = getNumber(level);
+		saveData();
 	}
 
 	private void processCommands(String message) {
@@ -68,6 +69,8 @@ public class NumberGuesserHW {
 			} else {
 				int remainder = maxStrikes - strikes;
 				System.out.println("You have " + remainder + "/" + maxStrikes + " attempts remaining");
+				//inserted saveData(); here
+				saveData();
 				if (guess > number) {
 					System.out.println("Lower");
 				} else if (guess < number) {
@@ -91,12 +94,24 @@ public class NumberGuesserHW {
 	private void saveLevel() {
 		try (FileWriter fw = new FileWriter(saveFile)) {
 			fw.write("" + level);// here we need to convert it to a String to record correctly
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
+	//new method saveData()
+	//does what saveLevel does but also writes strikes and number to be guessed to file
+	private void saveData() {
+		try (FileWriter fw = new FileWriter(saveFile)) {
+			fw.write("" + level + " " + strikes + " " + number);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	private boolean loadLevel() {
 		File file = new File(saveFile);
 		if (!file.exists()) {
@@ -104,9 +119,15 @@ public class NumberGuesserHW {
 		}
 		try (Scanner reader = new Scanner(file)) {
 			while (reader.hasNextLine()) {
+				//reads strikes and number from file in addition to level
 				int _level = reader.nextInt();
+				int _strikes = reader.nextInt();
+				int _number = reader.nextInt();
 				if (_level > 1) {
+					//sets current strikes and number to ints read in from file
 					level = _level;
+					strikes = _strikes;	
+					number = _number;
 					break;
 				}
 			}
@@ -127,8 +148,13 @@ public class NumberGuesserHW {
 					+ " attempts to guess.");
 			if (loadLevel()) {
 				System.out.println("Successfully loaded level " + level + " let's continue then");
+				//tell to user how many strikes they have from their previous save
+				System.out.println("You have " + strikes + " strikes.");
 			}
-			number = getNumber(level);
+			//if starting a new level, get a new number rather than the one read from the file
+			if(strikes == 0) {
+				number = getNumber(level);	
+			}
 			isRunning = true;
 			while (input.hasNext()) {
 				String message = input.nextLine();
