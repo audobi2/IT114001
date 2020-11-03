@@ -6,7 +6,7 @@ import java.util.List;
 import utils.Debug;
 
 public class Room implements AutoCloseable {
-    private static SocketServer server;// used to refer to accessible server functions
+    private static SocketServer server; // used to refer to accessible server functions
     private String name;
 
     // Commands
