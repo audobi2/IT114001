@@ -13,6 +13,7 @@ public class Player extends GameObject implements Serializable {
      * 
      */
     private static final long serialVersionUID = -6088251166673414031L;
+	//change color based on team
     Color color = Color.RED;
     Point nameOffset = new Point(0, 5);
 
@@ -33,6 +34,7 @@ public class Player extends GameObject implements Serializable {
 	return true;
     }
 
+    
     @Override
     public String toString() {
 	return String.format("Name: %s, p: (%d,%d), s: (%d, %d), d: (%d, %d), isAcitve: %s", name, position.x,

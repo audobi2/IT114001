@@ -21,6 +21,7 @@ import core.BaseGamePanel;
 
 public class GamePanel extends BaseGamePanel implements Event {
 
+	//teams assigned in this class?
     /**
      * 
      */
