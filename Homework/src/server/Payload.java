@@ -52,6 +52,7 @@ public class Payload implements Serializable {
 
     int x = 0;
     int y = 0;
+    int r = 0;
 
     public void setPoint(Point p) {
 	x = p.x;
