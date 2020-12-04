@@ -18,6 +18,7 @@ import javax.swing.InputMap;
 import javax.swing.KeyStroke;
 
 import core.BaseGamePanel;
+import java.util.Random;
 
 public class GamePanel extends BaseGamePanel implements Event {
 
@@ -27,6 +28,8 @@ public class GamePanel extends BaseGamePanel implements Event {
      */
     private static final long serialVersionUID = -1121202275148798015L;
     List<Player> players;
+    List<Player> teamMagentaPlayers;
+    List<Player> teamGreenPlayers;
     Player myPlayer;
     String playerUsername;// caching it so we don't lose it when room is wiped
     private final static Logger log = Logger.getLogger(GamePanel.class.getName());
@@ -36,6 +39,34 @@ public class GamePanel extends BaseGamePanel implements Event {
 	if (myPlayer != null) {
 	    myPlayer.setName(playerUsername);
 	}
+    }
+    
+    public void setPlayerTeam() {
+    	//if teams even amount, randomly choose one to put player in
+    	//if teams aren't equal, put in one with less players
+    	int mCount = teamMagentaPlayers.size();
+    	int gCount = teamGreenPlayers.size();
+    	Random rand = new Random();
+    	if (myPlayer != null) {
+    		if(mCount == gCount) {
+        		int randInt = rand.nextInt(2);
+        		if(randInt == 0) {
+        			teamMagentaPlayers.add(myPlayer);
+        			myPlayer.setTeam("magenta");
+        		} else {
+        			teamGreenPlayers.add(myPlayer);
+        			myPlayer.setTeam("green");
+        		}
+        	} else if(mCount < gCount) {
+    			teamMagentaPlayers.add(myPlayer);
+    			myPlayer.setTeam("magenta");
+        	} else if(mCount > gCount) {
+    			teamGreenPlayers.add(myPlayer);
+    			myPlayer.setTeam("green");
+        	}
+    		System.out.println("Player joined " + myPlayer.team + " team");
+    	}
+    	
     }
 
     @Override
@@ -54,6 +85,28 @@ public class GamePanel extends BaseGamePanel implements Event {
 	if (!exists) {
 	    Player p = new Player();
 	    p.setName(clientName);
+	    
+	    int mCount = teamMagentaPlayers.size();
+    	int gCount = teamGreenPlayers.size();
+    	Random rand = new Random();
+    	if(mCount == gCount) {
+        	int randInt = rand.nextInt(2);
+        	if(randInt == 0) {
+        		teamMagentaPlayers.add(p);
+        		p.setTeam("magenta");
+        	} else {
+        		teamGreenPlayers.add(p);
+        		p.setTeam("green");
+        	}
+        } else if(mCount < gCount) {
+    		teamMagentaPlayers.add(p);
+    		p.setTeam("magenta");
+        } else if(mCount > gCount) {
+    		teamGreenPlayers.add(p);
+    		p.setTeam("green");
+        }
+    	System.out.println("Player joined " + p.team + " team");
+	    
 	    players.add(p);
 	    // want .equals here instead of ==
 	    // https://www.geeksforgeeks.org/difference-equals-method-java/
@@ -104,6 +157,8 @@ public class GamePanel extends BaseGamePanel implements Event {
     @Override
     public void awake() {
 	players = new ArrayList<Player>();
+	teamMagentaPlayers = new ArrayList<Player>();
+	teamGreenPlayers = new ArrayList<Player>();
     }
 
     @Override

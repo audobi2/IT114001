@@ -157,13 +157,14 @@ public class ServerThread extends Thread {
 	    // this
 	    break;
 	case SYNC_DIRECTION:
-	    System.out.println("Direction changed: " + p.getPoint());
 	    currentRoom.sendDirectionSync(this, p.getPoint());
 	    break;
 	case SYNC_POSITION:
 	    // In my sample client will not be sharing their position
 	    // this will be handled 100% by the server
 	    break;
+	case SYNC_TEAM:
+		//teams aren't currently synced, so sync it here somehow?
 	default:
 	    log.log(Level.INFO, "Unhandled payload on server: " + p);
 	    break;
@@ -238,4 +239,4 @@ public class ServerThread extends Thread {
 	    }
 	}
     }
-}
+} 

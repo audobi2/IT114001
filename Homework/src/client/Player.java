@@ -13,8 +13,9 @@ public class Player extends GameObject implements Serializable {
      * 
      */
     private static final long serialVersionUID = -6088251166673414031L;
+    protected String team = "";
 	//change color based on team
-    Color color = Color.RED;
+    Color color = Color.GRAY;
     Point nameOffset = new Point(0, 5);
 
     /**
@@ -25,15 +26,31 @@ public class Player extends GameObject implements Serializable {
 	// using a boolean here so we can block drawing if isActive is false via call to
 	// super
 	if (super.draw(g)) {
+		/*
+		if(team == "magenta") {
+		    g.setColor(Color.MAGENTA);
+	    } else if(team == "green") {
+	    	g.setColor(Color.GREEN);
+	    } else {
+		    g.setColor(color);
+	    }
+	    */
 	    g.setColor(color);
 	    g.fillOval(position.x, position.y, size.width, size.height);
 	    g.setColor(Color.WHITE);
 	    g.setFont(new Font("Monospaced", Font.PLAIN, 12));
-	    g.drawString("Name: " + name, position.x + nameOffset.x, position.y + nameOffset.y);
+	    g.drawString("[" + team + "] " + name, position.x + nameOffset.x, position.y + nameOffset.y);
 	}
 	return true;
     }
 
+    public void setTeam(String team) {
+    	this.team = team;
+    }
+
+    public String getName() {
+    	return this.team;
+    }
     
     @Override
     public String toString() {

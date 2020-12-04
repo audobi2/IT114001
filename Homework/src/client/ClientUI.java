@@ -122,6 +122,7 @@ public class ClientUI extends JFrame implements Event {
 		    pack();
 		    self.setTitle(self.getTitle() + " - " + self.username);
 		    game.setPlayerName(self.username);
+		    game.setPlayerTeam();
 		    SocketClient.INSTANCE.setUsername(self.username);
 
 		    self.next();
