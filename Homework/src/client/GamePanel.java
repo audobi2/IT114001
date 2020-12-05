@@ -10,6 +10,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,6 +28,8 @@ public class GamePanel extends BaseGamePanel implements Event {
      */
     private static final long serialVersionUID = -1121202275148798015L;
     List<Player> players;
+    List<Player> teamMagentaPlayers;
+    List<Player> teamGreenPlayers;
     Player myPlayer;
     String playerUsername;// caching it so we don't lose it when room is wiped
     private final static Logger log = Logger.getLogger(GamePanel.class.getName());
@@ -55,6 +58,26 @@ public class GamePanel extends BaseGamePanel implements Event {
 	    Player p = new Player();
 	    p.setName(clientName);
 	    players.add(p);
+	    int mCount = teamMagentaPlayers.size();
+    	int gCount = teamGreenPlayers.size();
+    	Random rand = new Random();
+    	if(mCount == gCount) {
+        	int randInt = rand.nextInt(2);
+        	if(randInt == 0) {
+        		teamMagentaPlayers.add(p);
+        		p.setTeam("magenta");
+        	} else {
+        		teamGreenPlayers.add(p);
+        		p.setTeam("green");
+        	}
+        } else if(mCount < gCount) {
+    		teamMagentaPlayers.add(p);
+    		p.setTeam("magenta");
+        } else if(mCount > gCount) {
+    		teamGreenPlayers.add(p);
+    		p.setTeam("green");
+        }
+    	System.out.println("Player joined " + p.team + " team");
 	    // want .equals here instead of ==
 	    // https://www.geeksforgeeks.org/difference-equals-method-java/
 	    if (clientName.equals(playerUsername)) {
@@ -104,6 +127,8 @@ public class GamePanel extends BaseGamePanel implements Event {
     @Override
     public void awake() {
 	players = new ArrayList<Player>();
+	teamMagentaPlayers = new ArrayList<Player>();
+	teamGreenPlayers = new ArrayList<Player>();
     }
 
     @Override
