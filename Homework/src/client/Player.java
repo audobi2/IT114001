@@ -17,14 +17,13 @@ public class Player extends GameObject implements Serializable {
 	//change color based on team
     Color color = Color.WHITE;
     Point nameOffset = new Point(0, 5);
+    int hits = 0;
 
     /**
      * Gets called by the game engine to draw the current location/size
      */
     @Override
     public boolean draw(Graphics g) {
-	// using a boolean here so we can block drawing if isActive is false via call to
-	// super
 	if (super.draw(g)) {
 		if(team == "magenta") {
 		    g.setColor(Color.MAGENTA);
@@ -33,6 +32,9 @@ public class Player extends GameObject implements Serializable {
 	    } else {
 		    g.setColor(color);
 	    }
+		if(!isActive) {
+			g.setColor(Color.GRAY);
+		}
 	    g.fillOval(position.x, position.y, size.width, size.height);
 	    g.setColor(Color.WHITE);
 	    g.setFont(new Font("Monospaced", Font.PLAIN, 12));

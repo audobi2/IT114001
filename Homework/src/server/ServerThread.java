@@ -42,27 +42,6 @@ public class ServerThread extends Thread {
     }
 
     /***
-     * Sends the message to the client represented by this ServerThread
-     * 
-     * @param message
-     * @return
-     */
-    @Deprecated
-    protected boolean send(String message) {
-	// added a boolean so we can see if the send was successful
-	try {
-	    out.writeObject(message);
-	    return true;
-	}
-	catch (IOException e) {
-	    log.log(Level.INFO, "Error sending message to client (most likely disconnected)");
-	    e.printStackTrace();
-	    cleanup();
-	    return false;
-	}
-    }
-
-    /***
      * Replacement for send(message) that takes the client name and message and
      * converts it into a payload
      * 
@@ -113,6 +92,14 @@ public class ServerThread extends Thread {
 	Payload payload = new Payload();
 	payload.setPayloadType(PayloadType.CLEAR_PLAYERS);
 	return sendPayload(payload);
+    }
+    
+    protected boolean sendCountdown(String message, int duration) {
+    	Payload payload = new Payload();
+    	payload.setPayloadType(PayloadType.SET_COUNTDOWN);
+    	payload.setMessage(message);
+    	payload.setNumber(duration);
+    	return sendPayload(payload);
     }
 
     private boolean sendPayload(Payload p) {

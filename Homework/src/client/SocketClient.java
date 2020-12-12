@@ -150,6 +150,16 @@ public enum SocketClient {
 	    }
 	}
     }
+    
+    private void sendCountdown(String message, int duration) {
+    	Iterator<Event> iter = events.iterator();
+    	while (iter.hasNext()) {
+    	    Event e = iter.next();
+    	    if (e != null) {
+    		e.onSetCountdown(message, duration);
+    	    }
+    	}
+     }
 
     /***
      * Determine any special logic for different PayloadTypes
@@ -177,6 +187,9 @@ public enum SocketClient {
 	case SYNC_POSITION:
 	    sendSyncPosition(p.getClientName(), p.getPoint());
 	    break;
+	case SET_COUNTDOWN:
+		sendCountdown(p.getMessage(), p.getNumber());
+		break;
 	default:
 	    log.log(Level.WARNING, "unhandled payload on client" + p);
 	    break;
@@ -238,15 +251,6 @@ public enum SocketClient {
 	p.setPayloadType(PayloadType.SYNC_DIRECTION);
 	p.setPoint(dir);
 	sendPayload(p);
-    }
-
-    /**
-     * we won't be syncing position from the client since our server is the one
-     * that'll do it so creating this unused method as a reminder not to use/make it
-     */
-    @Deprecated
-    public void syncPosition() {
-	log.log(Level.SEVERE, "My sample doesn't use this");
     }
 
     public boolean start() throws IOException {

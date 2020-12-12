@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import client.Player;
 import core.BaseGamePanel;
+import core.Countdown;
 
 public class Room extends BaseGamePanel implements AutoCloseable {
     private static SocketServer server;// used to refer to accessible server functions
@@ -21,6 +22,7 @@ public class Room extends BaseGamePanel implements AutoCloseable {
     private final static String COMMAND_TRIGGER = "/";
     private final static String CREATE_ROOM = "createroom";
     private final static String JOIN_ROOM = "joinroom";
+    private final static String READY = "ready";
     private List<ClientPlayer> clients = new ArrayList<ClientPlayer>();
     static Dimension gameAreaSize = new Dimension(400, 600);
 
@@ -51,6 +53,28 @@ public class Room extends BaseGamePanel implements AutoCloseable {
 	return startPos;
     }
 
+    void nextRound(String message, int duration) {
+    	//reset state of game
+    	//revive players? put them back in playable state
+    	//maybe reset teams and randomize again
+    	//trigger new countdown
+    }
+    
+    protected void sendCountdown(String message, int duration) {
+    	new Countdown(message, duration, (x) -> {
+    	    System.out.println("Next stage");
+    	});
+    	Iterator<ClientPlayer> iter = clients.iterator();
+    	while (iter.hasNext()) {
+    	    ClientPlayer client = iter.next();
+    	    boolean messageSent = client.client.sendCountdown(message, duration);
+    	    if (!messageSent) {
+    		iter.remove();
+    		log.log(Level.INFO, "Removed client " + client.client.getId());
+    	    }
+    	}
+    }
+    
     protected synchronized void addClient(ServerThread client) {
 	client.setCurrentRoom(this);
 	boolean exists = false;
@@ -216,6 +240,9 @@ public class Room extends BaseGamePanel implements AutoCloseable {
 		    roomName = comm2[1];
 		    joinRoom(roomName, client);
 		    wasCommand = true;
+		    break;
+		case READY:
+			sendCountdown("Grab a Ticket", 30);
 		    break;
 		}
 	    }

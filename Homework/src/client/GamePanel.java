@@ -1,11 +1,14 @@
 package client;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,6 +22,7 @@ import javax.swing.InputMap;
 import javax.swing.KeyStroke;
 
 import core.BaseGamePanel;
+import core.Countdown;
 
 public class GamePanel extends BaseGamePanel implements Event {
 
@@ -32,6 +36,8 @@ public class GamePanel extends BaseGamePanel implements Event {
     List<Player> teamGreenPlayers;
     Player myPlayer;
     String playerUsername;// caching it so we don't lose it when room is wiped
+    Countdown timer;
+    Dimension gameAreaSize = new Dimension();
     private final static Logger log = Logger.getLogger(GamePanel.class.getName());
 
     public void setPlayerName(String name) {
@@ -133,7 +139,7 @@ public class GamePanel extends BaseGamePanel implements Event {
 
     @Override
     public void start() {
-
+    	timer = new Countdown("Round time", 60);
     }
 
     @Override
@@ -203,6 +209,7 @@ public class GamePanel extends BaseGamePanel implements Event {
 	((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	drawPlayers(g);
 	drawText(g);
+	drawUI((Graphics2D) g);
     }
 
     private synchronized void drawPlayers(Graphics g) {
@@ -223,6 +230,23 @@ public class GamePanel extends BaseGamePanel implements Event {
 	}
     }
 
+    
+    private void drawTimer(Graphics2D g2) {
+    	if (timer != null) {
+    	    g2.setColor(Color.WHITE);
+    	    g2.setFont(new Font("Monospaced", Font.PLAIN, 22));
+    	    g2.drawString(timer.getTimeMessage(), (int) (gameAreaSize.width * .45), 50);
+    	}
+        }
+
+   private void drawUI(Graphics2D g2) {
+    	drawTimer(g2);
+    	Stroke oldStroke = g2.getStroke();
+    	g2.setStroke(new BasicStroke(2));
+    	g2.drawRect(0, 0, gameAreaSize.width, gameAreaSize.height);
+    	g2.setStroke(oldStroke);
+   }
+    
     @Override
     public void quit() {
 	log.log(Level.INFO, "GamePanel quit");
@@ -281,5 +305,16 @@ public class GamePanel extends BaseGamePanel implements Event {
 		break;
 	    }
 	}
+    }
+    
+    public void onSetCountdown(String message, int duration) {
+    	// TODO Auto-generated method stub
+    	if (timer != null) {
+    	    timer.cancel();
+    	}
+    	timer = new Countdown(message, duration, (x) -> {
+    	    System.out.println("expired");
+    	    System.out.println(x);
+    	});
     }
 }
