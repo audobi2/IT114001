@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Random;
 
 public class Room implements AutoCloseable {
     private static SocketServer server;// used to refer to accessible server functions
@@ -15,6 +16,10 @@ public class Room implements AutoCloseable {
     private final static String COMMAND_TRIGGER = "/";
     private final static String CREATE_ROOM = "createroom";
     private final static String JOIN_ROOM = "joinroom";
+    private final static String ROLL = "roll";
+    private final static String FLIP = "flip";
+    
+    Random rand = new Random();
 
     public Room(String name) {
 	this.name = name;
@@ -122,6 +127,14 @@ public class Room implements AutoCloseable {
 		    joinRoom(roomName, client);
 		    wasCommand = true;
 		    break;
+		case ROLL:
+			sendRoll();
+			wasCommand = true;
+			break;
+		case FLIP:
+			sendFlip();
+			wasCommand = true;
+			break;
 		}
 	    }
 	}
@@ -168,6 +181,47 @@ public class Room implements AutoCloseable {
 	    }
 	}
     }
+   
+    //could combine sendFlip and sendRoll into one function...?
+    protected void sendFlip() {
+    	String result = "";
+    	int randInt = rand.nextInt(2);
+    	
+    	if (randInt == 0) {
+    		result = "heads";
+    	} else if(randInt == 1) {
+    		result = "tails";
+    	}
+    	
+    	Iterator<ServerThread> iter = clients.iterator();
+    	while (iter.hasNext()) {
+    	    ServerThread client = iter.next();
+    	    boolean messageSent = client.send("Flip result", result);
+    	    if (!messageSent) {
+    		iter.remove();
+    		log.log(Level.INFO, "Removed client " + client.getId());
+    	    }
+    	}
+    	
+    }
+    
+    protected void sendRoll() {
+    	//d6
+    	int randInt = rand.nextInt(6) + 1;
+
+    	String result = ""+randInt;
+    	
+    	Iterator<ServerThread> iter = clients.iterator();
+    	while (iter.hasNext()) {
+    	    ServerThread client = iter.next();
+    	    boolean messageSent = client.send("Roll result", result);
+    	    if (!messageSent) {
+    		iter.remove();
+    		log.log(Level.INFO, "Removed client " + client.getId());
+    	    }
+    	}
+    }
+    
 
     /***
      * Will attempt to migrate any remaining clients to the Lobby room. Will then
