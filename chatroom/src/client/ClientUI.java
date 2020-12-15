@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -213,9 +214,88 @@ public class ClientUI extends JFrame implements Event {
 
     void addMessage(String str) {
 	JEditorPane entry = new JEditorPane();
+	entry.setContentType("text/html");
 	entry.setEditable(false);
 	// entry.setLayout(null);
-	entry.setText(str);
+	
+	String displayStr = "";
+	
+	if (str.indexOf(":") > -1) {
+		String[] s = str.split(":", 2); //only split at the first instance of :
+		String name = s[0];
+		String msg = s[1];
+		
+		if(msg.indexOf("**") > -1) {
+			String[] s1 = msg.split("\\*\\*");
+			String m = "";
+			
+			for(int i = 0; i < s1.length; i++) {
+				if(i % 2 == 0) {
+					m += s1[i];
+				}
+				else {
+					m += "<b>" + s1[i] + "</b>";
+				}
+			}
+			
+			msg = m;
+		}
+		
+		if(msg.indexOf("~") > -1) {
+			String[] s1 = msg.split("~");
+			String m = "";
+			
+			for(int i = 0; i < s1.length; i++) {
+				if(i % 2 == 0) {
+					m += s1[i];
+				}
+				else {
+					m += "<i>" + s1[i] + "</i>";
+				}
+			}
+			
+			msg = m;
+		}
+		
+		if(msg.indexOf("_") > -1) {
+			String[] s1 = msg.split("_");
+			String m = "";
+			
+			for(int i = 0; i < s1.length; i++) {
+				if(i % 2 == 0) {
+					m += s1[i];
+				}
+				else {
+					m += "<u>" + s1[i] + "</u>";
+				}
+			}
+			
+			msg = m;
+		}
+		
+		//almost works, html isn't working
+		/*
+		if(msg.indexOf("red>") > -1) {
+			String[] s1 = msg.split("red>");
+			String m = "";
+			
+			for(int i = 0; i < s1.length; i++) {
+				if(i % 2 == 0) {
+					m += s1[i];
+				}
+				else {
+					m += "<div style=\"color:red;\">" + s1[i] + "</div>";
+				}
+			}
+			
+			msg = m;
+		}
+		*/
+		
+		displayStr = name + ":" + msg;		
+	}
+	
+	entry.setText(displayStr);
 	Dimension d = new Dimension(textArea.getSize().width, calcHeightForText(str));
 	// attempt to lock all dimensions
 	entry.setMinimumSize(d);
