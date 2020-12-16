@@ -2,6 +2,7 @@ package client;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -292,7 +293,18 @@ public class ClientUI extends JFrame implements Event {
 		}
 		*/
 		
-		displayStr = name + ":" + msg;		
+		//if it's one of the special commands like Flip or Roll, use different format
+		//if not, just do normal message format
+		if(name.equals("Flip result")) {
+			entry.setBackground(Color.LIGHT_GRAY);
+			displayStr = "Flipping a coin... result is <b><u>" + msg + "</b></u>";
+		} else if (name.equals("Roll result")) {
+			entry.setBackground(Color.LIGHT_GRAY);
+			displayStr = "Rolling a die... result is <b><u>" + msg + "</b></u>";
+		}
+		else {
+			displayStr = name + ":" + msg;	
+		}
 	}
 	
 	entry.setText(displayStr);
