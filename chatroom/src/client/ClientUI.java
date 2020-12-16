@@ -301,6 +301,10 @@ public class ClientUI extends JFrame implements Event {
 		} else if (name.equals("Roll result")) {
 			entry.setBackground(Color.LIGHT_GRAY);
 			displayStr = "Rolling a die... result is <b><u>" + msg + "</b></u>";
+		} else if(name.equals("Muted")) {
+			displayStr = "<i><u>" + msg + "</u> muted you!</i>";
+		} else if(name.equals("Unmuted")) {
+			displayStr = "<i><u>" + msg + "</u> unmuted you!</i>";
 		}
 		else {
 			displayStr = name + ":" + msg;	

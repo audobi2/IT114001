@@ -139,14 +139,24 @@ public class Room implements AutoCloseable {
 			sendFlip();
 			wasCommand = true;
 			break;
+		//check if the username is already in the mute list or not
 		case MUTE:
 			targetUserName = comm2[1];
-			client.muteUser(targetUserName);
+
+			if(!client.getMuteList().contains(targetUserName)) {
+				client.muteUser(targetUserName);
+				sendMuteMessage(client.getClientName(), targetUserName);
+			}
+			
 			wasCommand = true;
 			break;
 		case UNMUTE:
 			targetUserName = comm2[1];
-			client.unmuteUser(targetUserName);
+			
+			if(client.getMuteList().contains(targetUserName)) {
+				client.unmuteUser(targetUserName);
+				sendUnmuteMessage(client.getClientName(), targetUserName);
+			}
 			wasCommand = true;
 			break;
 		}
@@ -263,6 +273,36 @@ public class Room implements AutoCloseable {
     	return true;
     }
    
+    //muter = the person muting the muted
+    protected void sendMuteMessage(String muter, String muted) {
+    	Iterator<ServerThread> iter = clients.iterator();
+    	while (iter.hasNext()) {
+    	    ServerThread c = iter.next();
+    	    if (c.getClientName().equals(muted)) {
+    	    	 boolean messageSent = c.send("Muted", muter);
+    	    	 if (!messageSent) {
+    	    		iter.remove();
+    	    		log.log(Level.INFO, "Removed client " + c.getId());
+    	    	 }
+    	    }
+    	}
+    }
+    
+    //repetitive, so maybe merge into one method
+    protected void sendUnmuteMessage(String unmuter, String unmuted) {
+    	Iterator<ServerThread> iter = clients.iterator();
+    	while (iter.hasNext()) {
+    	    ServerThread c = iter.next();
+    	    if (c.getClientName().equals(unmuted)) {
+    	    	 boolean messageSent = c.send("Unmuted", unmuter);
+    	    	 if (!messageSent) {
+    	    		iter.remove();
+    	    		log.log(Level.INFO, "Removed client " + c.getId());
+    	    	 }
+    	    }
+    	}
+    }
+    
     //could combine sendFlip and sendRoll into one function...?
     protected void sendFlip() {
     	String result = "";
