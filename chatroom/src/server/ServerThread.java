@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,6 +15,7 @@ public class ServerThread extends Thread {
     private boolean isRunning = false;
     private Room currentRoom;// what room we are in, should be lobby by default
     private String clientName;
+    private ArrayList<String> muteList = new ArrayList<String>(); //keeps track of names of users this client has muted
     private final static Logger log = Logger.getLogger(ServerThread.class.getName());
 
     public String getClientName() {
@@ -31,6 +33,18 @@ public class ServerThread extends Thread {
 	else {
 	    log.log(Level.INFO, "Passed in room was null, this shouldn't happen");
 	}
+    }
+    
+    public ArrayList<String> getMuteList() {
+    	return muteList;
+    }
+    
+    public void muteUser(String username) {
+    	muteList.add(username);
+    }
+    
+    public void unmuteUser(String username) {
+    	muteList.remove(username);
     }
 
     public ServerThread(Socket myClient, Room room) throws IOException {
