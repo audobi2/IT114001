@@ -141,9 +141,13 @@ public class Room implements AutoCloseable {
 			break;
 		case MUTE:
 			targetUserName = comm2[1];
+			client.muteUser(targetUserName);
+			wasCommand = true;
 			break;
 		case UNMUTE:
 			targetUserName = comm2[1];
+			client.unmuteUser(targetUserName);
+			wasCommand = true;
 			break;
 		}
 	    }
@@ -197,6 +201,7 @@ public class Room implements AutoCloseable {
      * @param sender  The client sending the message
      * @param message The message to broadcast inside the room
      */
+    
     protected void sendMessage(ServerThread sender, String message) {
     //commented b/c not really accurate message?
 	//log.log(Level.INFO, getName() + ": Sending message to " + clients.size() + " clients");
@@ -205,6 +210,8 @@ public class Room implements AutoCloseable {
 	    return;
 	}
 	
+    //private messages handled here sorta
+    //TODO: muting doesnt work for this yet
 	boolean priv = false;
 	
 	if (message.indexOf(PRIVATE_MSG_TRIGGER) == 0) {
@@ -230,10 +237,12 @@ public class Room implements AutoCloseable {
 		Iterator<ServerThread> iter = clients.iterator();
 		while (iter.hasNext()) {
 		    ServerThread client = iter.next();
-		    boolean messageSent = client.send(sender.getClientName(), message);
-		    if (!messageSent) {
-			iter.remove();
-			log.log(Level.INFO, "Removed client " + client.getId());
+		    if(!client.getMuteList().contains(sender.getClientName())) {
+			    boolean messageSent = client.send(sender.getClientName(), message);
+			    if (!messageSent) {
+				iter.remove();
+				log.log(Level.INFO, "Removed client " + client.getId());
+			    }
 		    }
 		}
 	}
@@ -241,7 +250,7 @@ public class Room implements AutoCloseable {
     
     protected boolean sendPrivateMessage(ServerThread sender, ServerThread receiver, String message) {
     	log.log(Level.INFO, getName() + ": " + sender.getClientName() + " sending message to " + receiver.getClientName());
-    	boolean messageSent = sender.send("to " + sender.getClientName() + "[privately]", message);
+    	boolean messageSent = sender.send("to " + receiver.getClientName() + "[privately]", message);
     	if(!messageSent) {
     		log.log(Level.INFO, "Something went wrong. Uh oh.");
     		return false;
