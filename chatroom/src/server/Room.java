@@ -14,10 +14,13 @@ public class Room implements AutoCloseable {
 
     // Commands
     private final static String COMMAND_TRIGGER = "/";
+    private final static String PRIVATE_MSG_TRIGGER = "@";
     private final static String CREATE_ROOM = "createroom";
     private final static String JOIN_ROOM = "joinroom";
     private final static String ROLL = "roll";
     private final static String FLIP = "flip";
+    private final static String MUTE = "mute";
+    private final static String UNMUTE = "unmute";
     
     Random rand = new Random();
 
@@ -114,6 +117,7 @@ public class Room implements AutoCloseable {
 		    command = command.toLowerCase();
 		}
 		String roomName;
+		String targetUserName;
 		switch (command) {
 		case CREATE_ROOM:
 		    roomName = comm2[1];
@@ -135,8 +139,36 @@ public class Room implements AutoCloseable {
 			sendFlip();
 			wasCommand = true;
 			break;
+		case MUTE:
+			targetUserName = comm2[1];
+			break;
+		case UNMUTE:
+			targetUserName = comm2[1];
+			break;
 		}
 	    }
+	    /*
+	    if (message.indexOf(PRIVATE_MSG_TRIGGER) == 0) {
+	    	String[] s = message.split(" ", 2);
+	    	String targetUserName = s[0].substring(1);
+	    	String privMsg = s[1];
+	    	ServerThread receiver = null;
+	    	
+	    	//wasCommand = true;
+	    	
+	    	//somehow get the client from clients based on clientname
+	    	//then call sendPrivateMessage and pray it works
+	    	
+	    	Iterator<ServerThread> iter = clients.iterator();
+	    	while (iter.hasNext()) {
+	    	    ServerThread c = iter.next();
+	    	    if (c.getClientName().equals(targetUserName)) {
+	    	    	receiver = c;
+	    	    }
+	    	}
+	    	//sendPrivateMessage(client, receiver, privMsg);
+	    }
+	    */
 	}
 	catch (Exception e) {
 	    e.printStackTrace();
@@ -166,20 +198,60 @@ public class Room implements AutoCloseable {
      * @param message The message to broadcast inside the room
      */
     protected void sendMessage(ServerThread sender, String message) {
-	log.log(Level.INFO, getName() + ": Sending message to " + clients.size() + " clients");
-	if (processCommands(message, sender)) {
+    //commented b/c not really accurate message?
+	//log.log(Level.INFO, getName() + ": Sending message to " + clients.size() + " clients");
+    if (processCommands(message, sender)) {
 	    // it was a command, don't broadcast
 	    return;
 	}
-	Iterator<ServerThread> iter = clients.iterator();
-	while (iter.hasNext()) {
-	    ServerThread client = iter.next();
-	    boolean messageSent = client.send(sender.getClientName(), message);
-	    if (!messageSent) {
-		iter.remove();
-		log.log(Level.INFO, "Removed client " + client.getId());
-	    }
+	
+	boolean priv = false;
+	
+	if (message.indexOf(PRIVATE_MSG_TRIGGER) == 0) {
+    	String[] s = message.split(" ", 2);
+    	String targetUserName = s[0].substring(1);
+    	String privMsg = s[1];
+    	ServerThread receiver = null;
+    	
+    	//somehow get the client from clients based on clientname
+    	//then call sendPrivateMessage and pray it works
+    	
+    	Iterator<ServerThread> iter = clients.iterator();
+    	while (iter.hasNext()) {
+    	    ServerThread c = iter.next();
+    	    if (c.getClientName().equals(targetUserName)) {
+    	    	receiver = c;
+    	    }
+    	}
+        priv = sendPrivateMessage(sender, receiver, privMsg);
 	}
+
+	if(!priv) {
+		Iterator<ServerThread> iter = clients.iterator();
+		while (iter.hasNext()) {
+		    ServerThread client = iter.next();
+		    boolean messageSent = client.send(sender.getClientName(), message);
+		    if (!messageSent) {
+			iter.remove();
+			log.log(Level.INFO, "Removed client " + client.getId());
+		    }
+		}
+	}
+    }
+    
+    protected boolean sendPrivateMessage(ServerThread sender, ServerThread receiver, String message) {
+    	log.log(Level.INFO, getName() + ": " + sender.getClientName() + " sending message to " + receiver.getClientName());
+    	boolean messageSent = sender.send("to " + sender.getClientName() + "[privately]", message);
+    	if(!messageSent) {
+    		log.log(Level.INFO, "Something went wrong. Uh oh.");
+    		return false;
+    	}
+    	messageSent = receiver.send("from " + sender.getClientName() + "[privately]", message);
+    	if(!messageSent) {
+    		log.log(Level.INFO, "Something went wrong. Uh oh.");
+    		return false;
+    	}
+    	return true;
     }
    
     //could combine sendFlip and sendRoll into one function...?
