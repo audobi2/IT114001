@@ -1,6 +1,7 @@
 package client;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -19,5 +20,9 @@ public class User extends JPanel {
 
     public String getName() {
 	return name;
+    }
+    
+    public void setBackgroundColor(Color color) {
+    	nameField.setBackground(color);
     }
 }

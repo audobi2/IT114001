@@ -179,6 +179,7 @@ public class ClientUI extends JFrame implements Event {
 	u.setPreferredSize(p);
 	u.setMinimumSize(p);
 	u.setMaximumSize(p);
+	u.setBackgroundColor(Color.decode("#ebeef0"));
 	userPanel.add(u);
 	users.add(u);
 	pack();
@@ -189,6 +190,37 @@ public class ClientUI extends JFrame implements Event {
 	client.removeAll();
 	userPanel.revalidate();
 	userPanel.repaint();
+    }
+    
+    //m indicates whether to unmute or mute
+    void updateUserList(String m, String username) {
+    	if(m.equals("You muted")) {
+    		Iterator<User> iter = users.iterator();
+    		while (iter.hasNext()) {
+    		    User u = iter.next();
+    		    if (u.getName().equals(username)) {
+    		    	u.setBackgroundColor(Color.GRAY);
+    		    }
+    		}
+    	} else if(m.equals("You unmuted")) {
+    		Iterator<User> iter = users.iterator();
+    		while (iter.hasNext()) {
+    		    User u = iter.next();
+    		    if (u.getName().equals(username)) {
+    		    	u.setBackgroundColor(Color.decode("#ebeef0"));
+    		    }
+    		}
+    	} else {
+    		Iterator<User> iter = users.iterator();
+    		while (iter.hasNext()) {
+    			User u = iter.next();
+    		    if (u.getName().equals(m)) {
+    		    	u.setBackgroundColor(Color.CYAN);
+    		    } else {
+    		    	u.setBackgroundColor(Color.decode("#ebeef0"));
+    		    }
+    		}
+    	}
     }
 
     /***
@@ -375,7 +407,15 @@ public class ClientUI extends JFrame implements Event {
     @Override
     public void onMessageReceive(String clientName, String message) {
 	log.log(Level.INFO, String.format("%s: %s", clientName, message));
-	self.addMessage(String.format("%s: %s", clientName, message));
+	if(clientName.equals("You muted") || clientName.equals("You unmuted")) {
+		updateUserList(clientName, message);
+	} else {
+		self.addMessage(String.format("%s: %s", clientName, message));
+		//terrible logic
+		if(!clientName.equals("Flip result") && !clientName.equals("Roll result") && !clientName.equals("Muted") && !clientName.equals("Unmuted")) {
+			updateUserList(clientName, message);
+		}
+	}
     }
 
     @Override
