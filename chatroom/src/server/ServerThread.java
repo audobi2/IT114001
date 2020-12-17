@@ -1,10 +1,12 @@
 package server;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,6 +19,8 @@ public class ServerThread extends Thread {
     private String clientName;
     private ArrayList<String> muteList = new ArrayList<String>(); //keeps track of names of users this client has muted
     private final static Logger log = Logger.getLogger(ServerThread.class.getName());
+    private String chatLogFile;
+    private ArrayList<String> chatLog = new ArrayList<String>(); //keeps track of a log of messages received by client
 
     public String getClientName() {
 	return clientName;
@@ -45,6 +49,25 @@ public class ServerThread extends Thread {
     
     public void unmuteUser(String username) {
     	muteList.remove(username);
+    }
+    
+    public void exportChatLog() {
+    	chatLogFile = clientName + "_exported_chat_log.txt";
+    	try (FileWriter fw = new FileWriter(chatLogFile, false);) {
+    		Iterator<String> iter = chatLog.iterator();
+    		while(iter.hasNext()) {
+    			fw.write("\n"+iter.next());
+    		}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    //use this to add message to array keeping track of messages received by client for exporting the chat log
+    //dont know where to call it
+    private void addMessageToChatLog(String m) {
+    	chatLog.add(m);
     }
 
     public ServerThread(Socket myClient, Room room) throws IOException {
@@ -88,6 +111,7 @@ public class ServerThread extends Thread {
 	payload.setPayloadType(PayloadType.MESSAGE);
 	payload.setClientName(clientName);
 	payload.setMessage(message);
+	addMessageToChatLog(clientName + ": " + message); //not exactly working right, not the right format all the time - and doesn't get everything in the log
 
 	return sendPayload(payload);
     }

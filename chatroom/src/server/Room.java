@@ -21,6 +21,7 @@ public class Room implements AutoCloseable {
     private final static String FLIP = "flip";
     private final static String MUTE = "mute";
     private final static String UNMUTE = "unmute";
+    private final static String EXPORT_CHAT_LOG = "export";
     
     Random rand = new Random();
 
@@ -157,6 +158,10 @@ public class Room implements AutoCloseable {
 				client.unmuteUser(targetUserName);
 				sendUnmuteMessage(client.getClientName(), targetUserName);
 			}
+			wasCommand = true;
+			break;
+		case EXPORT_CHAT_LOG:
+			client.exportChatLog();
 			wasCommand = true;
 			break;
 		}
