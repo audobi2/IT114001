@@ -284,6 +284,12 @@ public class Room implements AutoCloseable {
     	    		iter.remove();
     	    		log.log(Level.INFO, "Removed client " + c.getId());
     	    	 }
+    	    } else if (c.getClientName().equals(muter)) {
+    	    	boolean messageSent = c.send("You muted", muted);
+    	    	if (!messageSent) {
+	   	    		iter.remove();
+	   	    		log.log(Level.INFO, "Removed client " + c.getId());
+    	    	}
     	    }
     	}
     }
@@ -299,6 +305,12 @@ public class Room implements AutoCloseable {
     	    		iter.remove();
     	    		log.log(Level.INFO, "Removed client " + c.getId());
     	    	 }
+    	    } else if (c.getClientName().equals(unmuter)) {
+    	    	boolean messageSent = c.send("You unmuted", unmuted);
+    	    	if (!messageSent) {
+	   	    		iter.remove();
+	   	    		log.log(Level.INFO, "Removed client " + c.getId());
+    	    	}
     	    }
     	}
     }
