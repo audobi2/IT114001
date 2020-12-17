@@ -111,7 +111,7 @@ public class ServerThread extends Thread {
 	payload.setPayloadType(PayloadType.MESSAGE);
 	payload.setClientName(clientName);
 	payload.setMessage(message);
-	addMessageToChatLog(clientName + ": " + message); //not exactly working right, not the right format all the time
+	addMessageToChatLog(clientName + ": " + message); //not exactly working right, not the right format all the time - and doesn't get everything in the log
 
 	return sendPayload(payload);
     }
