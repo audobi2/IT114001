@@ -21,6 +21,7 @@ public class ServerThread extends Thread {
     private final static Logger log = Logger.getLogger(ServerThread.class.getName());
     private String chatLogFile;
     private ArrayList<String> chatLog = new ArrayList<String>(); //keeps track of a log of messages received by client
+    private String muteLogFile;
 
     public String getClientName() {
 	return clientName;
@@ -45,10 +46,12 @@ public class ServerThread extends Thread {
     
     public void muteUser(String username) {
     	muteList.add(username);
+    	updateMuteList("mute", username);
     }
     
     public void unmuteUser(String username) {
     	muteList.remove(username);
+    	updateMuteList("unmute", username);
     }
     
     public void exportChatLog() {
@@ -69,10 +72,27 @@ public class ServerThread extends Thread {
     private void addMessageToChatLog(String m) {
     	chatLog.add(m);
     }
+    
+    private void updateMuteList(String option, String username) {
+    	muteLogFile = clientName + "_mute_list.txt";
+    	if(option.equals("mute")) {
+    		try (FileWriter fw = new FileWriter(muteLogFile, true);) {
+    			fw.write("\n"+username);
+    		} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	} else if(option.equals("unmute")) {
+    		//???
+    		//not sure how to remove user from file based on username
+    	}
+    }
+    
 
     public ServerThread(Socket myClient, Room room) throws IOException {
 	this.client = myClient;
 	this.currentRoom = room;
+	//update this.muteList based on iterating through muteLogFile?
 	out = new ObjectOutputStream(client.getOutputStream());
 	in = new ObjectInputStream(client.getInputStream());
     }
